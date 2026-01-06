@@ -12,7 +12,12 @@ exports.login = async (req, res) => {
 	req.session.codeVerifier = codeVerifier;
 	req.session.state = state;
 
-	res.redirect(url);
+	console.log('Login started. State:', state, 'Verifier:', codeVerifier);
+
+	req.session.save((err) => {
+		if (err) console.error('Session save error:', err);
+		res.redirect(url);
+	});
 };
 
 exports.callback = async (req, res) => {
