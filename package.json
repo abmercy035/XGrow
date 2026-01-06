@@ -1,5 +1,5 @@
 {
-  "name": "growtree",
+  "name": "xgrow",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
