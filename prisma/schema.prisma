@@ -57,6 +57,8 @@ model User {
   streaks        Streak[]
   followerHistory FollowerHistory[]
   transactions   Transaction[]
+  notifications  Notification[]
+  promotions     Promotion[]
 }
 
 
