@@ -30,10 +30,11 @@ exports.initializePayment = async (req, res) => {
 	try {
 		const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
 
-		// Price: NGN 5,000 (in kobo)
+		// Price: $1.00 USD
 		const params = JSON.stringify({
 			email: user.email,
-			amount: 5000 * 100,
+			amount: 100, // $1.00 in cents
+			currency: 'USD',
 			callback_url: `${req.protocol}://${req.get('host')}/api/payment/verify`,
 			metadata: {
 				userId: user.id
