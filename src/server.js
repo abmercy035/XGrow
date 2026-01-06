@@ -17,13 +17,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Database Pool for Sessions
+// Database Pool for Sessions
 const isProduction = process.env.NODE_ENV === 'production';
-const connectionString = process.env.DATABASE_URL || '';
-const isCloudDb = connectionString.includes('aivencloud') || connectionString.includes('neon') || connectionString.includes('supabase');
+let connectionString = process.env.DATABASE_URL;
 
+console.log('DB Connection String exists:', !!connectionString);
+
+if (connectionString && !connectionString.includes('sslmode=')) {
+  connectionString += (connectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify';
+} else if (connectionString && connectionString.includes('sslmode=require')) {
+  connectionString = connectionString.replace('sslmode=require', 'sslmode=no-verify');
+}
+
+// Force loose SSL for Aiven or any production-like environment
 const pool = new Pool({
   connectionString: connectionString,
-  ssl: (isProduction || isCloudDb) ? { rejectUnauthorized: false } : false
 });
 
 app.use(session({
