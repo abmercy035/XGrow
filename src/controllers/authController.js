@@ -88,9 +88,15 @@ exports.callback = async (req, res) => {
 			},
 		});
 
+
 		// Update Session
 		req.session.userId = user.id;
-		req.session.user = user;
+		req.session.user = { ...user, isPro: user.isPro || false };
+
+		// WAILIST GATEKEEPER
+		if (!user.isPro) {
+			return res.redirect('/payment.html');
+		}
 
 		res.redirect('/'); // Go to dashboard
 	} catch (err) {
