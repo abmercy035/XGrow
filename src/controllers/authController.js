@@ -71,7 +71,6 @@ exports.callback = async (req, res) => {
 				accessToken,
 				refreshToken,
 				// tokenExpiresAt,
-				// tokenExpiresAt,
 				email: `${userObject.username}_${userObject.id}@xgrow.app`,
 				followerCount: userObject.public_metrics?.followers_count || 0,
 				profileImageUrl: userObject.profile_image_url,
