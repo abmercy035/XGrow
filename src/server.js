@@ -11,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5500;
 
 // Middleware
+app.set('trust proxy', 1); // Trust first proxy (Vercel)
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
