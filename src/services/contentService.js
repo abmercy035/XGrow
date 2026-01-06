@@ -89,15 +89,33 @@ async function generateWithFallback(prompt, apiKey) {
 
 			if (!text) throw new Error("Empty response received");
 
+            // Attempt JSON Parse
+            try {
+                // Find first { and last } to handle potential markdown wrappers
+                const firstBrace = text.indexOf('{');
+                const lastBrace = text.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1) {
+                    const jsonStr = text.substring(firstBrace, lastBrace + 1);
+                    const json = JSON.parse(jsonStr);
+                    if (json.tweet) {
+                         console.log(`[AI Service] ✓ Success with ${modelName} (JSON Mode)`);
+                         return json.tweet;
+                    }
+                }
+            } catch (e) {
+                console.warn("[AI Service] JSON Parse failed, falling back to text cleanup", e);
+            }
+
 			// Cleanup: Remove surrounding quotes and excessive markdown symbols
-			// Remove markdown bold/italic markers (* or _) but keep the text
+            // Relaxed cleaning to not destroy text
 			const cleanText = text
 				.replace(/^["']|["']$/g, '')       // Remove quotes
-				.replace(/(\*|_)+/g, '')            // Remove * and _ completely
 				.replace(/^#+\s+/gm, '')            // Remove headers
+                .replace(/```json/g, '')
+                .replace(/```/g, '')
 				.trim();
 
-			console.log(`[AI Service] ✓ Success with ${modelName}`);
+			console.log(`[AI Service] ✓ Success with ${modelName} (Text fallback)`);
 			return cleanText;
 
 		} catch (error) {
@@ -220,7 +238,9 @@ ${lengthPreference === 'long' ? 'REMINDER: This MUST be over 500 characters. Cou
 </Task>
 
 <Output_Format>
-ONLY the tweet text. No quotes. No "Here is the tweet."
+Return a single JSON object with the key "tweet".
+Example: { "tweet": "Your tweet here" }
+DO NOT output conversational text.
 </Output_Format>
   `;
 
