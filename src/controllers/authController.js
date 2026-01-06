@@ -58,23 +58,25 @@ exports.callback = async (req, res) => {
 				username: userObject.username,
 				accessToken,
 				refreshToken,
-				tokenExpiresAt,
+				// tokenExpiresAt, // TODO: Add to schema migration
+				// email: `${userObject.username}@x.com`, // Email is unique, avoid hardcode collision
 				followerCount: userObject.public_metrics?.followers_count || 0,
 				profileImageUrl: userObject.profile_image_url,
 				bio: userObject.description,
-				isVerified: userObject.verified || false,
+				// isVerified: userObject.verified || false, // TODO: Add to schema migration
 			},
 			create: {
 				twitterId: userObject.id,
 				username: userObject.username,
 				accessToken,
 				refreshToken,
-				tokenExpiresAt,
-				email: `${userObject.username}@x.com`,
+				// tokenExpiresAt,
+				// tokenExpiresAt,
+				email: `${userObject.username}_${userObject.id}@xgrow.app`,
 				followerCount: userObject.public_metrics?.followers_count || 0,
 				profileImageUrl: userObject.profile_image_url,
 				bio: userObject.description,
-				isVerified: userObject.verified || false,
+				// isVerified: userObject.verified || false,
 			},
 		});
 
