@@ -59,26 +59,7 @@ model User {
   transactions   Transaction[]
 }
 
-model Transaction {
-  id        String   @id @default(uuid())
-  reference String   @unique // Paystack reference
-  amount    Float
-  status    String   // SUCCESS, PENDING, FAILED
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-}
 
-model Board {
-  id          String   @id @default(uuid())
-  name        String
-  category    String   // 'Thought Leadership', 'Engagement', 'Promotion'
-  customPrompt String?
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
 
 model Streak {
   id        String   @id @default(uuid())
