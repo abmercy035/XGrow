@@ -1,9 +1,10 @@
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,58 +14,84 @@ model User {
   passwordHash   String?  // Optional if using strictly OAuth
   isAdmin        Boolean  @default(false)
   
-  // Twitter Data
-  twitterId      String?  @unique
-  username       String?
-  accessToken    String?
-  refreshToken   String?
-  tokenExpiresAt DateTime?
-  isVerified     Boolean  @default(false)
-  
-  // Settings
+  // Profile
+  username       String?  @unique
+  profileImageUrl String?
+  bio            String?
   niche          String?
   goal           String?
-  region         String?  // For time zone and fallback posting times
+  region         String?  // 'Global', 'Nigeria', etc.
+  customTone     String?
+  
+  // Brand/Business (Optional)
+  brandName      String?
+  brandUrl       String?
+  
+  // Twitter Integration
+  twitterId      String?  @unique
+  accessToken    String?
+  refreshToken   String?
   
   // Subscription
   isPro          Boolean  @default(false)
-  generationCount Int      @default(0)
-  stripeCustomerId String?
-  subscriptionEnd DateTime?
+  subscriptionId String?
+  
+  // Usage tracking
+  generationCount Int     @default(0) // Free tier limit
+  lastPostDate   DateTime?
   
   // Gamification
   currentStreak  Int      @default(0)
   longestStreak  Int      @default(0)
-  lastPostDate   DateTime?
   
-  // Growth Metrics
-  followerCount     Int      @default(0)
-  previousFollowerCount Int  @default(0)
-  lastMetricsUpdate DateTime?
-  
-  // Preferences
-  customTone     String?  // User's custom writing style instructions
-  
-  // Profile Data
-  profileImageUrl String?
-  bio            String?
+  // Analytics
+  auditData      String?  // JSON string of profile audit
   lastAuditDate  DateTime?
-  auditData      String?  // JSON string of analysis results
+  followerCount  Int      @default(0)
+  previousFollowerCount Int @default(0) // For calculating growth
   
-  boards         Board[]
-  followerHistory FollowerHistory[]
-  promotions      Promotion[]
-  transactions    Transaction[]
-  notifications  Notification[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  boards         Board[]
+  streaks        Streak[]
+  followerHistory FollowerHistory[]
+  transactions   Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  reference String   @unique // Paystack reference
+  amount    Float
+  status    String   // SUCCESS, PENDING, FAILED
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Board {
+  id          String   @id @default(uuid())
+  name        String
+  category    String   // 'Thought Leadership', 'Engagement', 'Promotion'
+  customPrompt String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Streak {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model FollowerHistory {
-  id        String   @id @default(cuid())
-  userId    String
+  id        String   @id @default(uuid())
   count     Int
   date      DateTime @default(now())
+  userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@unique([userId, date])

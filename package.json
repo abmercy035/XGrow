@@ -22,6 +22,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^5.22.0",
+    "connect-pg-simple": "^10.0.0",
     "connect-sqlite3": "^0.9.16",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -30,6 +31,7 @@
     "express-session": "^1.18.2",
     "node-cron": "^3.0.3",
     "openai": "^4.104.0",
+    "pg": "^8.16.3",
     "twitter-api-v2": "^1.28.0"
   }
 }
