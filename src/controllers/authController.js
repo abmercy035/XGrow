@@ -85,7 +85,7 @@ exports.callback = async (req, res) => {
 		res.redirect('/'); // Go to dashboard
 	} catch (err) {
 		console.error('Login error:', err);
-		res.status(403).send('Invalid verifier or access tokens');
+		res.status(403).send(`Invalid verifier or access tokens. Details: ${err.message || JSON.stringify(err)}`);
 	}
 };
 
