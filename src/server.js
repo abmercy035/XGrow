@@ -17,9 +17,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Database Pool for Sessions
+const isProduction = process.env.NODE_ENV === 'production';
+const connectionString = process.env.DATABASE_URL || '';
+const isCloudDb = connectionString.includes('aivencloud') || connectionString.includes('neon') || connectionString.includes('supabase');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: connectionString,
+  ssl: (isProduction || isCloudDb) ? { rejectUnauthorized: false } : false
 });
 
 app.use(session({
