@@ -153,7 +153,7 @@ font - weight: 500;
             </label>
         </div>
 
-        <button class="btn btn-primary" style="width: 100%;" onclick="app.generateTweet('${board.id}')">
+        <button class="btn btn-primary" style="width: 100%;" onclick="app.generateTweet('${board.id}', this)">
           Generate Tweet
         </button>
         
@@ -632,9 +632,16 @@ font - weight: 500;
     }
   },
 
-  generateTweet: async (boardId) => {
+  generateTweet: async (boardId, btn) => {
     const area = document.getElementById(`tweet-area-${boardId}`);
     const length = document.querySelector(`input[name="length-${boardId}"]:checked`)?.value || 'short';
+
+    // UI Loading State
+    const originalText = btn ? btn.innerText : 'Generate Tweet';
+    if (btn) {
+      btn.textContent = 'Generating...';
+      btn.disabled = true;
+    }
 
     area.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.9rem;">✨ Generating...</p>';
 
@@ -678,6 +685,11 @@ font - weight: 500;
         `;
       } else {
         area.innerHTML = `<p style="color: var(--error);">Error: ${err.message}</p>`;
+      }
+    } finally {
+      if (btn) {
+        btn.textContent = originalText;
+        btn.disabled = false;
       }
     }
   },
