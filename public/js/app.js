@@ -400,64 +400,9 @@ font - weight: 500;
         <h3 style="margin-bottom: 20px;"><i data-lucide="trending-up" style="width: 18px; height: 18px; display: inline; vertical-align: middle;"></i> Follower Growth (Last 30 Days)</h3>
         
         ${app.user.isPro ? `
-          <canvas id="followerChart" style="max-height: 300px;"></canvas>
-          <script>
-            (async () => {
-              try {
-                const res = await fetch('/api/profile/follower-history');
-                const data = await res.json();
-                
-                if (!res.ok || data.length === 0) {
-                  document.getElementById('followerChart').parentElement.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-tertiary);">No follower data yet. Check back tomorrow after daily tracking runs!</div>';
-                  return;
-                }
-                
-                const ctx = document.getElementById('followerChart').getContext('2d');
-                new Chart(ctx, {
-                  type: 'line',
-                  data: {
-                    labels: data.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-                    datasets: [{
-                      label: 'Followers',
-                      data: data.map(d => d.count),
-                      borderColor: 'rgba(29, 155, 240, 1)',
-                      backgroundColor: 'rgba(29, 155, 240, 0.1)',
-                      tension: 0.4,
-                      fill: true
-                    }]
-                  },
-                  options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                      legend: { display: false },
-                      tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        borderColor: 'rgba(29, 155, 240, 0.5)',
-                        borderWidth: 1
-                      }
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: false,
-                        ticks: { color: '#8899a6' },
-                        grid: { color: 'rgba(255,255,255,0.05)' }
-                      },
-                      x: {
-                        ticks: { color: '#8899a6' },
-                        grid: { display: false }
-                      }
-                    }
-                  }
-                });
-              } catch (err) {
-                console.error(err);
-                document.getElementById('followerChart').parentElement.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--error);">Failed to load chart data</div>';
-              }
-            })();
-          </script>
+          <div id="follower-chart-container">
+            <div style="padding: 40px; text-align: center; color: var(--text-tertiary);">Loading chart...</div>
+          </div>
         ` : `
           <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 40px; text-align: center; border: 1px dashed rgba(255,255,255,0.1);">
             <i data-lucide="lock" style="width: 48px; height: 48px; opacity: 0.3; margin-bottom: 12px;"></i>
@@ -520,31 +465,28 @@ font - weight: 500;
       <div class="card glass">
         <h3 style="margin-bottom: 20px;"><i data-lucide="calendar" style="width: 18px; height: 18px; display: inline; vertical-align: middle;"></i> Posting Activity</h3>
 
-    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 16px; max-width: 250px;">
-      <!-- Activity Heatmap simulation (7 weeks) -->
-      ${Array.from({ length: 49 }, (_, i) => {
-        const hasActivity = Math.random() > 0.5;
-        const intensity = hasActivity ? Math.floor(Math.random() * 4) + 1 : 0;
-        const color = intensity === 0 ? 'rgba(255,255,255,0.05)' :
-          intensity === 1 ? 'rgba(29, 155, 240, 0.2)' :
-            intensity === 2 ? 'rgba(29, 155, 240, 0.4)' :
-              intensity === 3 ? 'rgba(29, 155, 240, 0.6)' :
-                'rgba(29, 155, 240, 0.8)';
-        return `<div style="width: 10px; height: 10px; background: ${color}; border-radius: 2px;" title="Activity day ${i}"></div>`;
-      }).join('')}
-    </div>
+        <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
+          <div style="text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--success);">${app.user.currentStreak || 0}</div>
+            <div style="font-size: 0.8rem; color: var(--text-tertiary);">Current Streak</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-primary);">${app.user.longestStreak || 0}</div>
+            <div style="font-size: 0.8rem; color: var(--text-tertiary);">Best Streak</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary);">${app.user.generationCount || 0}</div>
+            <div style="font-size: 0.8rem; color: var(--text-tertiary);">Total Posts</div>
+          </div>
+        </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-tertiary);">
-      <span>Less</span>
-      <div style="display: flex; gap: 4px;">
-        <div style="width: 12px; height: 12px; background: rgba(255,255,255,0.05); border-radius: 2px;"></div>
-        <div style="width: 12px; height: 12px; background: rgba(29, 155, 240, 0.2); border-radius: 2px;"></div>
-        <div style="width: 12px; height: 12px; background: rgba(29, 155, 240, 0.4); border-radius: 2px;"></div>
-        <div style="width: 12px; height: 12px; background: rgba(29, 155, 240, 0.6); border-radius: 2px;"></div>
-        <div style="width: 12px; height: 12px; background: rgba(29, 155, 240, 0.8); border-radius: 2px;"></div>
-      </div>
-      <span>More</span>
-    </div>
+        <div style="padding: 16px; background: rgba(0, 186, 124, 0.1); border-radius: 8px; border-left: 3px solid var(--success);">
+          <div style="font-size: 0.9rem; color: var(--text-secondary);">
+            ${app.user.lastPostDate
+        ? `Last posted: <strong>${new Date(app.user.lastPostDate).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</strong>`
+        : 'You haven\'t confirmed any posts yet. Generate a tweet and click "I Posted" to start tracking!'}
+          </div>
+        </div>
 
     <p style="margin-top: 12px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
       Posting streak: <strong style="color: var(--success);">${app.user.currentStreak} days</strong> •
@@ -553,6 +495,70 @@ font - weight: 500;
   </div>
 `;
     lucide.createIcons();
+
+    // Load follower chart if Pro user
+    if (app.user.isPro) {
+      app.loadFollowerChart();
+    }
+  },
+
+  loadFollowerChart: async () => {
+    const container = document.getElementById('follower-chart-container');
+    if (!container) return;
+
+    try {
+      const res = await fetch('/api/profile/follower-history');
+      const data = await res.json();
+
+      console.log('Follower history response:', res.ok, data);
+
+      if (!res.ok) {
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--error);">' + (data.error || 'Failed to load data') + '</div>';
+        return;
+      }
+
+      if (data.length === 0) {
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-tertiary);">No follower data yet. Check back tomorrow!</div>';
+        return;
+      }
+
+      // If only 1 data point, show current stat
+      if (data.length === 1) {
+        const count = data[0].count;
+        container.innerHTML = '<div style="padding: 40px; text-align: center;"><div style="font-size: 3rem; font-weight: 800; color: var(--accent-primary); margin-bottom: 8px;">' + count.toLocaleString() + '</div><div style="color: var(--text-secondary); margin-bottom: 16px;">Current Followers</div><div style="font-size: 0.85rem; color: var(--text-tertiary);">📊 Growth chart appears after multiple days of data.</div></div>';
+        return;
+      }
+
+      // Multiple data points - render chart
+      container.innerHTML = '<canvas id="followerChart" style="max-height: 300px;"></canvas>';
+      const ctx = document.getElementById('followerChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+          datasets: [{
+            label: 'Followers',
+            data: data.map(d => d.count),
+            borderColor: 'rgba(29, 155, 240, 1)',
+            backgroundColor: 'rgba(29, 155, 240, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: false, ticks: { color: '#8899a6' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#8899a6' }, grid: { display: false } }
+          }
+        }
+      });
+    } catch (err) {
+      console.error('Follower chart error:', err);
+      container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--error);">Failed to load chart</div>';
+    }
   },
 
   openCreateModal: () => {
@@ -562,6 +568,32 @@ font - weight: 500;
 
   closeModal: (id) => {
     document.getElementById(id).classList.remove('active');
+  },
+
+  toggleMobileMenu: () => {
+    const sidebar = document.querySelector('.sidebar');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    sidebar.classList.toggle('open');
+
+    // Update icon
+    const icon = menuBtn.querySelector('i');
+    if (sidebar.classList.contains('open')) {
+      icon.setAttribute('data-lucide', 'x');
+    } else {
+      icon.setAttribute('data-lucide', 'menu');
+    }
+    lucide.createIcons();
+  },
+
+  closeMobileMenu: () => {
+    const sidebar = document.querySelector('.sidebar');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    sidebar.classList.remove('open');
+    const icon = menuBtn?.querySelector('i');
+    if (icon) {
+      icon.setAttribute('data-lucide', 'menu');
+      lucide.createIcons();
+    }
   },
 
   handleCreateSubmit: async (e) => {

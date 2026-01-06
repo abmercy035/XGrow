@@ -25,6 +25,7 @@ exports.getProfile = async (req, res) => {
         bio: true,
         lastAuditDate: true,
         auditData: true,
+        generationCount: true,
         createdAt: true
       }
     });
@@ -124,7 +125,7 @@ exports.getFollowerHistory = async (req, res) => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const history = await prisma.followerHistory.findMany({
+    let history = await prisma.followerHistory.findMany({
       where: {
         userId: req.session.userId,
         date: { gte: thirtyDaysAgo }
@@ -135,6 +136,23 @@ exports.getFollowerHistory = async (req, res) => {
         count: true
       }
     });
+
+    // Auto-seed initial data point if history is empty
+    if (history.length === 0) {
+      const count = user.followerCount || 0;
+      await prisma.followerHistory.create({
+        data: {
+          userId: req.session.userId,
+          count: count,
+          date: new Date()
+        }
+      });
+
+      history = [{
+        date: new Date(),
+        count: count
+      }];
+    }
 
     res.json(history);
   } catch (err) {
