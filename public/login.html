@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login / GrowTree</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<style>
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+		}
+
+		.auth-container {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			padding: 20px;
+		}
+
+		.auth-card {
+			width: 100%;
+			max-width: 400px;
+			text-align: center;
+			padding: 40px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<nav class="container flex-between" style="padding-top: 24px; width: 100%; box-sizing: border-box;">
+		<a href="/landing.html"
+		   style="text-decoration: none; font-weight: 800; font-size: 1.5rem; color: white;">GrowTree.</a>
+	</nav>
+
+	<div class="auth-container scale-in">
+		<div class="card glass auth-card">
+			<div style="font-size: 3rem; margin-bottom: 16px;">🔐</div>
+
+			<h1 style="font-size: 1.75rem; margin-bottom: 12px;">Welcome Back</h1>
+			<p style="margin-bottom: 32px; font-size: 0.95rem;">
+				Connect your X account to continue your growth journey.
+			</p>
+
+			<a href="/auth/twitter" class="btn btn-primary"
+			   style="width: 100%; box-sizing: border-box; justify-content: center; margin-bottom: 20px;">
+				<svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"
+					 style="width: 20px; height: 20px; margin-right: 12px;">
+					<path
+						  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+					</path>
+				</svg>
+				Sign in with X
+			</a>
+
+			<div style="font-size: 0.8rem; color: var(--text-tertiary);">
+				By signing in, you agree to our <a href="#" style="color: var(--text-secondary);">Terms</a> and <a
+				   href="#" style="color: var(--text-secondary);">Privacy Policy</a>.
+				<br>We never post without your explicit confirmation.
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Check if already logged in
+		fetch('/auth/me')
+			.then(res => {
+				if (res.ok) window.location.href = '/';
+			})
+			.catch(() => { });
+	</script>
+</body>
+
+</html>

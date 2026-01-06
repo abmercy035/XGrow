@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GrowTree - AI-Powered Twitter Growth</title>
+	<meta name="description"
+		  content="Grow your X/Twitter audience with AI-generated content that sounds authentically you. No more writer's block. Just consistent, engaging posts.">
+	<link rel="stylesheet" href="/css/style.css">
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			overflow-x: hidden;
+		}
+
+		.hero {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			position: relative;
+		}
+
+		.hero-content {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			padding: 120px 20px 80px;
+			max-width: 900px;
+			margin: 0 auto;
+		}
+
+		.hero h1 {
+			font-size: clamp(2.5rem, 6vw, 4rem);
+			font-weight: 800;
+			margin-bottom: 24px;
+			line-height: 1.1;
+			background: linear-gradient(135deg, #fff 0%, #1d9bf0 50%, #00ba7c 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.hero p {
+			font-size: 1.25rem;
+			color: var(--text-secondary);
+			margin-bottom: 40px;
+			max-width: 600px;
+		}
+
+		.hero-cta {
+			display: flex;
+			gap: 16px;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		.hero-cta .btn {
+			padding: 16px 32px;
+			font-size: 1rem;
+		}
+
+		.hero-image {
+			width: 100%;
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 0 20px 60px;
+		}
+
+		.hero-image img {
+			width: 100%;
+			border-radius: 16px;
+			box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			background: rgba(29, 155, 240, 0.1);
+			border: 1px solid rgba(29, 155, 240, 0.3);
+			padding: 8px 16px;
+			border-radius: 50px;
+			font-size: 0.85rem;
+			color: var(--accent-primary);
+			margin-bottom: 24px;
+		}
+
+		.section {
+			padding: 100px 20px;
+		}
+
+		.section-header {
+			text-align: center;
+			max-width: 600px;
+			margin: 0 auto 60px;
+		}
+
+		.section-header h2 {
+			font-size: 2.5rem;
+			font-weight: 700;
+			margin-bottom: 16px;
+		}
+
+		.section-header p {
+			color: var(--text-secondary);
+		}
+
+		.features-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 32px;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+
+		.feature-card {
+			background: rgba(255, 255, 255, 0.02);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			border-radius: 16px;
+			padding: 32px;
+			transition: transform 0.3s, border-color 0.3s;
+		}
+
+		.feature-card:hover {
+			transform: translateY(-4px);
+			border-color: rgba(29, 155, 240, 0.3);
+		}
+
+		.feature-icon {
+			width: 48px;
+			height: 48px;
+			background: linear-gradient(135deg, rgba(29, 155, 240, 0.2), rgba(0, 186, 124, 0.2));
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			margin-bottom: 20px;
+		}
+
+		.feature-card h3 {
+			font-size: 1.25rem;
+			margin-bottom: 12px;
+		}
+
+		.feature-card p {
+			color: var(--text-secondary);
+			font-size: 0.95rem;
+			line-height: 1.6;
+		}
+
+		.screenshots-section {
+			background: linear-gradient(180deg, transparent, rgba(29, 155, 240, 0.02), transparent);
+		}
+
+		.screenshots-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+			gap: 40px;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+
+		.screenshot-card {
+			text-align: center;
+		}
+
+		.screenshot-card img {
+			width: 100%;
+			border-radius: 12px;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+			margin-bottom: 20px;
+		}
+
+		.screenshot-card h3 {
+			font-size: 1.25rem;
+			margin-bottom: 8px;
+		}
+
+		.screenshot-card p {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+
+		.pricing-section {
+			background: linear-gradient(180deg, transparent, rgba(255, 215, 0, 0.02), transparent);
+		}
+
+		.pricing-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 32px;
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		.pricing-card {
+			background: rgba(255, 255, 255, 0.02);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			border-radius: 20px;
+			padding: 40px;
+			text-align: center;
+			position: relative;
+		}
+
+		.pricing-card.featured {
+			background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 165, 0, 0.02));
+			border-color: rgba(255, 215, 0, 0.3);
+		}
+
+		.pricing-card.featured::before {
+			content: 'Most Popular';
+			position: absolute;
+			top: -12px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: linear-gradient(135deg, #FFD700, #FFA500);
+			color: #000;
+			padding: 6px 16px;
+			border-radius: 20px;
+			font-size: 0.75rem;
+			font-weight: 700;
+		}
+
+		.pricing-card h3 {
+			font-size: 1.5rem;
+			margin-bottom: 16px;
+		}
+
+		.pricing-price {
+			font-size: 3rem;
+			font-weight: 800;
+			margin-bottom: 8px;
+		}
+
+		.pricing-price span {
+			font-size: 1rem;
+			font-weight: 400;
+			color: var(--text-secondary);
+		}
+
+		.pricing-features {
+			list-style: none;
+			padding: 0;
+			margin: 32px 0;
+			text-align: left;
+		}
+
+		.pricing-features li {
+			padding: 12px 0;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			color: var(--text-secondary);
+		}
+
+		.pricing-features li::before {
+			content: '✓';
+			color: var(--success);
+			font-weight: 700;
+		}
+
+		.cta-section {
+			text-align: center;
+			padding: 120px 20px;
+			background: linear-gradient(180deg, transparent, rgba(29, 155, 240, 0.05));
+		}
+
+		.cta-section h2 {
+			font-size: 2.5rem;
+			margin-bottom: 20px;
+		}
+
+		.cta-section p {
+			color: var(--text-secondary);
+			margin-bottom: 32px;
+			max-width: 500px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.footer {
+			padding: 40px 20px;
+			text-align: center;
+			border-top: 1px solid rgba(255, 255, 255, 0.05);
+			color: var(--text-tertiary);
+			font-size: 0.85rem;
+		}
+
+		.nav {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 100;
+			padding: 20px;
+			background: rgba(10, 15, 26, 0.8);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.nav-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.nav-logo {
+			font-weight: 800;
+			font-size: 1.5rem;
+			color: white;
+			text-decoration: none;
+		}
+
+		.stats-bar {
+			display: flex;
+			gap: 40px;
+			justify-content: center;
+			padding: 40px 20px;
+			border-top: 1px solid rgba(255, 255, 255, 0.05);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			flex-wrap: wrap;
+		}
+
+		.stat-item {
+			text-align: center;
+		}
+
+		.stat-value {
+			font-size: 2.5rem;
+			font-weight: 800;
+			color: var(--accent-primary);
+		}
+
+		.stat-label {
+			font-size: 0.85rem;
+			color: var(--text-tertiary);
+		}
+
+		@media (max-width: 768px) {
+			.screenshots-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.hero-cta {
+				flex-direction: column;
+				width: 100%;
+				padding: 0 20px;
+			}
+
+			.hero-cta .btn {
+				width: 100%;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="nav">
+		<div class="nav-content">
+			<a href="/" class="nav-logo">GrowTree.</a>
+			<a href="/login.html" class="btn btn-primary" style="padding: 10px 24px;">Get Started</a>
+		</div>
+	</nav>
+
+	<!-- Hero Section -->
+	<section class="hero">
+		<div class="hero-content">
+			<div class="badge">
+				✨ AI-Powered Growth
+			</div>
+			<h1>Grow Your X Audience on Autopilot</h1>
+			<p>
+				Stop staring at blank screens. Our AI generates engaging tweets that match your unique voice,
+				so you can stay consistent and grow your following without burning out.
+			</p>
+			<div class="hero-cta">
+				<a href="/login.html" class="btn btn-primary">
+					<svg fill="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; margin-right: 8px;">
+						<path
+							  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+						</path>
+					</svg>
+					Start Growing Free
+				</a>
+				<a href="#features" class="btn btn-outline">See How It Works</a>
+			</div>
+		</div>
+		<div class="hero-image">
+			<img src="/images/dashboard-mockup.png" alt="GrowTree Dashboard">
+		</div>
+	</section>
+
+	<!-- Stats Bar -->
+	<div class="stats-bar">
+		<div class="stat-item">
+			<div class="stat-value">10K+</div>
+			<div class="stat-label">Tweets Generated</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-value">500+</div>
+			<div class="stat-label">Active Creators</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-value">85%</div>
+			<div class="stat-label">Engagement Increase</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-value">14 Days</div>
+			<div class="stat-label">Avg Streak Length</div>
+		</div>
+	</div>
+
+	<!-- Features Section -->
+	<section class="section" id="features">
+		<div class="section-header">
+			<h2>Everything You Need to Grow</h2>
+			<p>Powerful features designed for creators who want to build an audience without spending hours on content.
+			</p>
+		</div>
+		<div class="features-grid">
+			<div class="feature-card">
+				<div class="feature-icon">🤖</div>
+				<h3>AI Tweet Generation</h3>
+				<p>Our AI learns your voice and niche to generate tweets that sound authentically you. No more generic
+					AI content.</p>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">📊</div>
+				<h3>Growth Boards</h3>
+				<p>Create multiple boards for different strategies—thought leadership, engagement, promotion—each with
+					custom AI prompts.</p>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">🔥</div>
+				<h3>Streak Tracking</h3>
+				<p>Build consistency with daily posting streaks. Gamify your growth and never miss a day.</p>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">📈</div>
+				<h3>Analytics Dashboard</h3>
+				<p>Track follower growth, engagement patterns, and discover your best posting times with detailed
+					analytics.</p>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">🎯</div>
+				<h3>Profile Analysis</h3>
+				<p>Get AI-powered insights about your content performance, tone, and personalized recommendations.</p>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">⚡</div>
+				<h3>One-Click Posting</h3>
+				<p>Generate, copy, and post to X instantly. Or schedule for later with our seamless workflow.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Screenshots Section -->
+	<section class="section screenshots-section" id="screenshots">
+		<div class="section-header">
+			<h2>See It in Action</h2>
+			<p>A beautiful, intuitive dashboard that makes growing your audience actually enjoyable.</p>
+		</div>
+		<div class="screenshots-grid">
+			<div class="screenshot-card">
+				<img src="/images/tweet-mockup.png" alt="Tweet Generation">
+				<h3>AI Tweet Generation</h3>
+				<p>Get perfectly crafted tweets in seconds with one click</p>
+			</div>
+			<div class="screenshot-card">
+				<img src="/images/analytics-mockup.png" alt="Analytics Dashboard">
+				<h3>Growth Analytics</h3>
+				<p>Track your progress with detailed insights and charts</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Pricing Section -->
+	<section class="section pricing-section" id="pricing">
+		<div class="section-header">
+			<h2>Simple, Transparent Pricing</h2>
+			<p>Start free, upgrade when you're ready to go unlimited.</p>
+		</div>
+		<div class="pricing-grid">
+			<div class="pricing-card">
+				<h3>Free Trial</h3>
+				<div class="pricing-price">₦0</div>
+				<p style="color: var(--text-tertiary);">Get started instantly</p>
+				<ul class="pricing-features">
+					<li>3 AI tweet generations</li>
+					<li>Basic streak tracking</li>
+					<li>1 Growth Board</li>
+					<li>Community leaderboard</li>
+				</ul>
+				<a href="/login.html" class="btn btn-outline" style="width: 100%;">Start Free</a>
+			</div>
+			<div class="pricing-card featured">
+				<h3>Pro</h3>
+				<div class="pricing-price">₦5,000 <span>one-time</span></div>
+				<p style="color: var(--text-tertiary);">Lifetime access</p>
+				<ul class="pricing-features">
+					<li>Unlimited generations</li>
+					<li>Long-form tweets</li>
+					<li>Unlimited Growth Boards</li>
+					<li>Profile analytics</li>
+					<li>Follower growth tracking</li>
+					<li>Priority support</li>
+				</ul>
+				<a href="/login.html" class="btn btn-primary"
+				   style="width: 100%; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: 700;">Upgrade
+					to Pro</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- CTA Section -->
+	<section class="cta-section">
+		<h2>Ready to Grow Your Audience?</h2>
+		<p>Join hundreds of creators who are building their X presence with AI-powered consistency.</p>
+		<a href="/login.html" class="btn btn-primary" style="padding: 18px 40px; font-size: 1.1rem;">
+			<svg fill="currentColor" viewBox="0 0 24 24" style="width: 22px; height: 22px; margin-right: 10px;">
+				<path
+					  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+				</path>
+			</svg>
+			Get Started Free
+		</a>
+	</section>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<p>© 2024 GrowTree. Built for creators, by creators.</p>
+	</footer>
+</body>
+
+</html>

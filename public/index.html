@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard / GrowTree</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<style>
+		header {
+			background: var(--bg-card);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			padding: 16px 24px;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		.header-content {
+			max-width: 1400px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.dashboard-layout {
+			display: grid;
+			grid-template-columns: 250px 1fr;
+			gap: 24px;
+			padding: 24px;
+			max-width: 1400px;
+			margin: 0 auto;
+		}
+
+		/* Fix for grid overflow with carousel */
+		.dashboard-layout>div {
+			min-width: 0;
+		}
+
+		.sidebar {
+			background: var(--bg-card);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			border-radius: var(--radius-md);
+			padding: 24px;
+			height: fit-content;
+			position: sticky;
+			top: 100px;
+		}
+
+		.sidebar-item {
+			padding: 12px 16px;
+			margin-bottom: 8px;
+			border-radius: var(--radius-sm);
+			cursor: pointer;
+			transition: all 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			color: var(--text-secondary);
+		}
+
+		.sidebar-item:hover {
+			background: rgba(255, 255, 255, 0.05);
+		}
+
+		.sidebar-item.active {
+			background: rgba(29, 155, 240, 0.15);
+			color: var(--accent-primary);
+			border-left: 3px solid var(--accent-primary);
+		}
+
+		.metrics-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 16px;
+			margin-bottom: 32px;
+		}
+
+		.metric-card {
+			background: linear-gradient(135deg, rgba(29, 155, 240, 0.1), rgba(0, 186, 124, 0.05));
+			border: 1px solid rgba(29, 155, 240, 0.2);
+			padding: 20px;
+			border-radius: var(--radius-md);
+		}
+
+		.metric-value {
+			font-size: 2rem;
+			font-weight: 800;
+			margin: 8px 0;
+		}
+
+		.metric-label {
+			font-size: 0.85rem;
+			color: var(--text-tertiary);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Header -->
+	<header>
+		<div class="header-content">
+			<div style="display: flex; align-items: center; gap: 32px;">
+				<h1
+					style="font-size: 1.5rem; margin: 0; background: linear-gradient(45deg, #fff, #8899a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+					GrowTree.</h1>
+				<input type="text" placeholder="Search boards..."
+					   style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 20px; width: 300px; margin: 0;">
+			</div>
+
+			<div style="display: flex; align-items: center; gap: 20px;">
+				<div
+					 style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(29, 155, 240, 0.1); border-radius: 20px;">
+					<div
+						 style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success);">
+					</div>
+					<span id="header-username" style="font-size: 0.9rem; font-weight: 600;">@loading...</span>
+				</div>
+				<button class="btn btn-primary" onclick="app.openCreateModal()"
+						style="padding: 8px 16px; font-size: 0.9rem;">
+					<i data-lucide="plus" style="width: 16px; height: 16px; margin-right: 4px;"></i> New Board
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<div class="dashboard-layout">
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<div style="margin-bottom: 24px;">
+				<h3
+					style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 16px;">
+					Navigation</h3>
+			</div>
+
+			<div class="sidebar-item active" onclick="app.switchView('boards')">
+				<i data-lucide="layout-grid" style="width: 18px; height: 18px;"></i> Boards
+			</div>
+			<div class="sidebar-item" onclick="app.switchView('profile')">
+				<i data-lucide="user" style="width: 18px; height: 18px;"></i> Profile
+			</div>
+			<div class="sidebar-item" onclick="app.switchView('analytics')">
+				<i data-lucide="trending-up" style="width: 18px; height: 18px;"></i> Analytics
+			</div>
+
+			<div style="margin-top: auto; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05);">
+				<!-- Upgrade Button (shown via JS for non-pro users) -->
+				<div id="upgrade-cta" style="display: none; margin-bottom: 16px;">
+					<button class="btn" onclick="document.getElementById('upgradeModal').classList.add('active')"
+							style="width: 100%; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: 700; justify-content: center;">
+						<i data-lucide="crown" style="width: 16px; height: 16px; margin-right: 6px;"></i> Upgrade to Pro
+					</button>
+					<div style="font-size: 0.7rem; color: var(--text-tertiary); text-align: center; margin-top: 8px;">
+						<span id="generations-left">3</span>/3 free generations left
+					</div>
+				</div>
+
+				<a href="/auth/logout" class="sidebar-item" style="text-decoration: none; color: var(--text-tertiary);">
+					<i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Logout
+				</a>
+			</div>
+		</div>
+
+		<!-- Main Content -->
+		<div>
+			<!-- Metrics -->
+			<div class="metrics-grid">
+				<div class="metric-card">
+					<div class="metric-label">Current Streak</div>
+					<div class="metric-value" id="currentStreak">0</div>
+					<div style="font-size: 0.8rem; color: var(--text-secondary);">
+						<i data-lucide="flame"
+						   style="width: 14px; height: 14px; display: inline; vertical-align: middle;"></i> days in a
+						row
+					</div>
+				</div>
+				<div class="metric-card">
+					<div class="metric-label">Longest Streak</div>
+					<div class="metric-value" id="longestStreak">0</div>
+					<div style="font-size: 0.8rem; color: var(--text-secondary);">
+						<i data-lucide="award"
+						   style="width: 14px; height: 14px; display: inline; vertical-align: middle;"></i> personal
+						record
+					</div>
+				</div>
+				<div class="metric-card">
+					<div class="metric-label">Total Boards</div>
+					<div class="metric-value" id="totalBoards">0</div>
+					<div style="font-size: 0.8rem; color: var(--text-secondary);">
+						<i data-lucide="folder"
+						   style="width: 14px; height: 14px; display: inline; vertical-align: middle;"></i> active goals
+					</div>
+				</div>
+			</div>
+
+			<!-- Promoted Accounts Section -->
+			<div id="promoted-section"></div>
+
+			<!-- View Container -->
+			<div id="view-container"></div>
+
+			<!-- Admin View (Hidden by default) -->
+			<div id="admin-view" style="display: none;">
+				<h2 style="margin-bottom: 24px;">Admin Dashboard</h2>
+				<div class="metrics-grid">
+					<div class="metric-card">
+						<div class="metric-label">Total Users</div>
+						<div class="metric-value" id="admin-total-users">-</div>
+					</div>
+					<div class="metric-card">
+						<div class="metric-label">Pro Users</div>
+						<div class="metric-value" id="admin-pro-users">-</div>
+					</div>
+					<div class="metric-card">
+						<div class="metric-label">Revenue (NGN)</div>
+						<div class="metric-value" id="admin-revenue">-</div>
+					</div>
+				</div>
+
+				<div class="glass" style="padding: 24px; border-radius: 16px;">
+					<h3>User Management</h3>
+					<div style="overflow-x: auto; margin-top: 16px;">
+						<table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+							<thead>
+								<tr style="text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">
+									<th style="padding: 12px;">User</th>
+									<th style="padding: 12px;">Status</th>
+									<th style="padding: 12px;">Gen Count</th>
+									<th style="padding: 12px;">Actions</th>
+								</tr>
+							</thead>
+							<tbody id="admin-users-table"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Upgrade Modal -->
+	<div class="modal-overlay" id="upgradeModal">
+		<div class="modal" style="text-align: center;">
+			<div style="font-size: 3rem; margin-bottom: 16px;">💎</div>
+			<h2>Upgrade to Pro</h2>
+			<p style="color: var(--text-secondary); margin-bottom: 24px;">
+				You've hit your free trial limit of 3 generations. <br>
+				Unlock unlimited AI power and long-form tweets.
+			</p>
+			<div style="font-size: 2rem; font-weight: 800; margin-bottom: 8px;">₦5,000</div>
+			<div style="font-size: 0.9rem; color: var(--text-tertiary); margin-bottom: 24px;">One-time payment</div>
+
+			<button class="btn btn-primary" onclick="app.initializePayment()"
+					style="width: 100%; justify-content: center;">
+				Pay with Paystack
+			</button>
+			<button class="btn btn-outline" onclick="app.closeModal('upgradeModal')"
+					style="width: 100%; justify-content: center; margin-top: 12px; border: none;">
+				Maybe Later
+			</button>
+		</div>
+	</div>
+	<!-- Create Board Modal -->
+	<div class="modal-overlay" id="createModal">
+		<div class="modal">
+			<div class="flex-between" style="margin-bottom: 24px;">
+				<h2>New Growth Board</h2>
+				<button class="btn" onclick="app.closeModal('createModal')" style="padding: 8px;">✕</button>
+			</div>
+
+			<form onsubmit="app.handleCreateSubmit(event)">
+				<label>Board Title</label>
+				<input type="text" id="m_title" placeholder="e.g. Backend Engineering Authority" required>
+
+				<label>Main Objective</label>
+				<input type="text" id="m_objective" placeholder="e.g. Grow to 5k followers via technical threads"
+					   required>
+
+				<label>Strategy / Niche</label>
+				<input type="text" id="m_strategy" placeholder="e.g. Educational, Python Tips, System Design" required>
+
+				<label>Custom Prompt (Optional)</label>
+				<textarea id="m_customPrompt"
+						  placeholder="e.g. Always use lowercase, avoid corporate buzzwords, be edgy..."
+						  style="min-height: 80px; resize: vertical;"></textarea>
+
+				<div style="margin-top: 24px; text-align: right;">
+					<button type="button" class="btn btn-outline" onclick="app.closeModal('createModal')"
+							style="margin-right: 8px;">Cancel</button>
+					<button type="submit" class="btn btn-primary">Create Board</button>
+				</div>
+			</form>
+			</form>
+		</div>
+	</div>
+
+	<!-- Promote Modal -->
+	<div class="modal-overlay" id="promoteModal">
+		<div class="modal">
+			<div class="flex-between" style="margin-bottom: 24px;">
+				<h2>Promote Your Account 🚀</h2>
+				<button class="btn" onclick="app.closeModal('promoteModal')" style="padding: 8px;">✕</button>
+			</div>
+			<p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">
+				Get noticed by thousands of other creators. Boost your profile for 24 hours.
+			</p>
+
+			<form onsubmit="app.handlePromoteSubmit(event)">
+				<label>Tagline (The hook)</label>
+				<input type="text" id="promo_tagline" placeholder="e.g. I share hidden AI tools" maxlength="50"
+					   required>
+				<div
+					 style="font-size: 0.75rem; color: var(--text-tertiary); text-align: right; margin-top: -8px; margin-bottom: 16px;">
+					Max 50 chars</div>
+
+				<div
+					 style="background: rgba(29, 155, 240, 0.1); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+					<div class="flex-between">
+						<span style="font-weight: 600;">24-Hour Boost</span>
+						<span style="font-weight: 700; color: var(--accent-primary);">$5.00</span>
+					</div>
+				</div>
+
+				<div style="margin-top: 24px; text-align: right;">
+					<button type="submit" class="btn btn-primary" style="width: 100%;">Pay & Promote</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Upgrade Modal -->
+	<div class="modal-overlay" id="upgradeModal">
+		<div class="modal">
+			<div class="flex-between" style="margin-bottom: 24px;">
+				<h2>Upgrade to Pro ✨</h2>
+				<button class="btn" onclick="app.closeModal('upgradeModal')" style="padding: 8px;">✕</button>
+			</div>
+			<p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">
+				Unlock unlimited tweet generations, profile analytics, and more.
+			</p>
+
+			<div
+				 style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1)); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255, 215, 0, 0.3);">
+				<h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+					<i data-lucide="crown" style="width: 20px; height: 20px; color: #FFD700;"></i> Pro Benefits
+				</h3>
+				<ul style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 20px;">
+					<li style="margin-bottom: 8px;">✅ Unlimited tweet generations</li>
+					<li style="margin-bottom: 8px;">✅ Long-form tweet generation</li>
+					<li style="margin-bottom: 8px;">✅ Profile analytics & insights</li>
+					<li style="margin-bottom: 8px;">✅ Follower growth tracking</li>
+					<li>✅ Priority support</li>
+				</ul>
+				<div
+					 style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255, 215, 0, 0.2); display: flex; justify-content: space-between; align-items: center;">
+					<span style="font-size: 0.85rem; color: var(--text-tertiary);">Lifetime Access</span>
+					<span style="font-size: 1.5rem; font-weight: 700; color: #FFD700;">₦5,000</span>
+				</div>
+			</div>
+
+			<button class="btn btn-primary" onclick="app.initializePayment()"
+					style="width: 100%; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: 700;">
+				<i data-lucide="credit-card" style="width: 18px; height: 18px; margin-right: 8px;"></i> Pay with
+				Paystack
+			</button>
+			<p style="font-size: 0.75rem; color: var(--text-tertiary); text-align: center; margin-top: 12px;">
+				One-time payment. No recurring fees.
+			</p>
+		</div>
+	</div>
+
+	<script src="/js/app.js"></script>
+</body>
+
+</html>
