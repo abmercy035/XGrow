@@ -1,23 +1,32 @@
+
 const { twitterClient, callbackUrl } = require('../utils/twitterClient');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 exports.login = async (req, res) => {
-	const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(
-		callbackUrl,
-		{ scope: ['tweet.read', 'users.read', 'follows.read', 'like.read', 'offline.access'] }
-	);
+	try {
+					const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(
+						callbackUrl,
+						{ scope: ['tweet.read', 'users.read', 'follows.read', 'like.read', 'offline.access'] }
+					);
 
-	// Store strict PKCE vars in session
-	req.session.codeVerifier = codeVerifier;
-	req.session.state = state;
+					// Store strict PKCE vars in session
+					req.session.codeVerifier = codeVerifier;
+					req.session.state = state;
 
-	console.log('Login started. State:', state, 'Verifier:', codeVerifier);
+					console.log('Login started. State:', state, 'Verifier:', codeVerifier);
 
-	req.session.save((err) => {
-		if (err) console.error('Session save error:', err);
-		res.redirect(url);
-	});
+					req.session.save((err) => {
+									if (err) {
+										console.error('Session save error:', err);
+										return res.status(500).send(`Session save error: ${err.message}`);
+									}
+									res.redirect(url);
+								});
+				} catch (err) {
+					console.error('Login Error:', err);
+					res.status(500).send(`Login failed: ${err.message}`);
+				}
 };
 
 exports.callback = async (req, res) => {
