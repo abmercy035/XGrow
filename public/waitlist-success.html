@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitlist Confirmed - XGrow</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" href="https://abs.twimg.com/favicons/twitter.3.ico">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#000000',
+                        secondary: '#1d9bf0',
+                        green: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 flex items-center justify-center min-h-screen">
+
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden p-8 text-center relative">
+        <div class="mb-6 flex justify-center">
+            <div class="bg-green-100 rounded-full p-4">
+                 <svg class="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+        </div>
+
+        <h1 class="text-3xl font-bold mb-2">You're on the list!</h1>
+        <p class="text-gray-500 mb-6">Payment verified. You have secured your spot for early access to XGrow.</p>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-8 text-left border border-gray-100">
+            <h3 class="font-semibold text-gray-800 mb-2">What happens next?</h3>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                    We are finalizing the beta.
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                    You'll receive an email when your dashboard unlocks.
+                </li>
+            </ul>
+        </div>
+
+        <a href="https://twitter.com" class="block w-full bg-black text-white font-bold py-3 px-4 rounded-full text-lg hover:bg-gray-800 transition duration-200">
+            Back to X
+        </a>
+    </div>
+</body>
+</html>

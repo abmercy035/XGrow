@@ -98,7 +98,12 @@ exports.callback = async (req, res) => {
 			return res.redirect('/payment.html');
 		}
 
-		res.redirect('/'); // Go to dashboard
+		// If paid but not admin -> Waitlist Success (Lockout dashboard)
+		if (!user.isAdmin) {
+			return res.redirect('/waitlist-success.html');
+		}
+
+		res.redirect('/'); // Admins go to Dashboard
 	} catch (err) {
 		console.error('Login error:', err);
 		res.status(403).send(`Invalid verifier or access tokens. Details: ${err.message || JSON.stringify(err)}`);

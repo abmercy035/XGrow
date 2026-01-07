@@ -106,8 +106,8 @@ exports.verifyPayment = async (req, res) => {
 				});
 			}
 
-			// Redirect to dashboard with success flag
-			res.redirect('/?payment=success');
+			// Redirect to waitlist success page (gatekeeper)
+			res.redirect('/waitlist-success.html');
 		} else {
 			res.redirect('/?payment=failed');
 		}
