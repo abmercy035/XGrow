@@ -33,7 +33,7 @@ exports.initializePayment = async (req, res) => {
 		// Price: ~ $5.00 (Waitlist Discount) - approx 7500 NGN
 		const params = JSON.stringify({
 			email: user.email,
-			amount: 7500 * 100, // 7500 Naira in kobo
+			amount: 5000 * 100, // 5000 Naira in kobo (Approx $5 for Waitlist)
 			// currency: 'NGN', // Default is NGN
 			callback_url: `${req.protocol}://${req.get('host')}/api/payment/verify`,
 			metadata: {
