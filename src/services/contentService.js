@@ -89,9 +89,18 @@ async function generateWithFallback(prompt, apiKey) {
 
 			if (!text) throw new Error("Empty response received");
 
+			const cleanResponse = (txt) => {
+				return txt
+					.replace(/^["']|["']$/g, '')       // Remove quotes
+					.replace(/(\*|_)+/g, '')            // Remove markdown formatters
+					.replace(/^#+\s+/gm, '')            // Remove headers
+					.replace(/```json/g, '')
+					.replace(/```/g, '')
+					.trim();
+			};
+
             // Attempt JSON Parse
-            try {
-                // Find first { and last } to handle potential markdown wrappers
+			try {
                 const firstBrace = text.indexOf('{');
                 const lastBrace = text.lastIndexOf('}');
                 if (firstBrace !== -1 && lastBrace !== -1) {
@@ -99,22 +108,15 @@ async function generateWithFallback(prompt, apiKey) {
                     const json = JSON.parse(jsonStr);
                     if (json.tweet) {
                          console.log(`[AI Service] ✓ Success with ${modelName} (JSON Mode)`);
-                         return json.tweet;
+																					return cleanResponse(json.tweet); // APPLY CLEANUP
                     }
                 }
             } catch (e) {
                 console.warn("[AI Service] JSON Parse failed, falling back to text cleanup", e);
             }
 
-			// Cleanup: Remove surrounding quotes and excessive markdown symbols
-            // Relaxed cleaning to not destroy text
-			const cleanText = text
-				.replace(/^["']|["']$/g, '')       // Remove quotes
-				.replace(/^#+\s+/gm, '')            // Remove headers
-                .replace(/```json/g, '')
-                .replace(/```/g, '')
-				.trim();
-
+			// Fallback
+			const cleanText = cleanResponse(text);
 			console.log(`[AI Service] ✓ Success with ${modelName} (Text fallback)`);
 			return cleanText;
 
@@ -149,7 +151,7 @@ exports.generateDailyTweet = async (boardId, lengthPreference = 'short') => {
 
 	// 1. Context Gathering
 	const detectedStyle = await getUserStyle(user);
-	const customInstructions = user.user?.customTone ? `User's specific tone instructions: "${user.customTone}"` : '';
+	const customInstructions = user.customTone ? `User's specific tone instructions: "${user.customTone}"` : '';
 	const boardInstructions = board.customPrompt ? `Specific board instructions: "${board.customPrompt}"` : '';
 
 	// Fetch previous recent tweets to prevent repetition
@@ -167,6 +169,10 @@ exports.generateDailyTweet = async (boardId, lengthPreference = 'short') => {
 	// Add randomness to prevent identical outputs
 	const angles = [
 		"A controversial opinion",
+		"A controversial question",
+		"A intruging question",
+		"A science discovery",
+		"A past event",
 		"A common mistake beginners make",
 		"A sudden realization",
 		"A prediction for the future",
@@ -194,55 +200,65 @@ CRITICAL: Write a LONG-FORM post.
 
 	// Style Instructions
 	const prompt = `
-  <Identity>
-    You are the "Brain Double" for a practitioner in the ${nicheContext} space, for a specific individual on X (Twitter).
-    Your goal is to write a high-engagement, authentic tweet that sounds 100% human and 0% AI.
-  </Identity>
- 
- <Style_Fingerprint>
-- User's unique vibe: ${detectedStyle}
-- Specific Tone tweaks: ${customInstructions}
-- Writing Rules: No hashtags. ${lengthPreference === 'long' ? 'THIS IS A LONG-FORM POST. DO NOT BE BRIEF.' : 'Keep it short.'}
+<Identity>
+You are the "Digital Twin" of a person in the ${nicheContext} space. 
+Your personality is NOT fixed. You must perfectly adopt the persona described in the <Style_Fingerprint> section below. 
+You are not an assistant; you are the user themselves, sharing a thought, realizations and question as it hits your brain.
+</Identity>
+
+<Style_Fingerprint>
+[CORE PERSONA]: ${detectedStyle}
+[SPECIFIC VOICE TWEAKS]: ${customInstructions}
+[WRITING RIGOR]: 
+1. Adopt the user's specific vocabulary and sentence structures.
+2. If the user is casual, be casual. If they are academic, be academic. If they are chaotic, be chaotic.
+3. DO NOT BOLD or ITALICIZE WORDS (no *word*).
+4. Do not use hashtags or emojis unless they are explicitly mentioned in the [CORE PERSONA].
 </Style_Fingerprint>
 
-<Strategic_Intent>
-- Niche: ${nicheContext}
-- Strategy: ${board.strategy}
-- Target Topic: ${board.objective}
-- Board-Specific Rules: ${boardInstructions}
-- **CREATIVE ANGLE FOR THIS TWEET: ${randomAngle}** (Strictly focus on this angle)
-</Strategic_Intent>
+<Strategic_Environment>
+- Industry: ${nicheContext}
+- Current Strategy: ${board.strategy}
+- Goal: Create a high-engagement post about "${board.objective}" without naming the topic literally.
+- Creative Entry Point: ${randomAngle} (Focus exclusively on this specific perspective).
+- Sanity Check: do not make the content be too obvious or generic and too similar to the previous tweets.
+- Smart check: do not overly or neccesarily mention "${board.objective}" or "${board.strategy}" in the content.
+- Constraints: ${boardInstructions}
+</Strategic_Environment>
 
-<History_Constraints>
-The user has recently posted the following tweets. **DO NOT WRITE ANYTHING SIMILAR TO THESE:**
+<Novelty_Check>
+The following concepts have already been covered. DO NOT repeat these ideas or sentence structures:
 ${historyContext}
-(Ensure your new tweet is distinct in concept and phrasing from the list above)
-</History_Constraints>
+</Novelty_Check>
 
 <Negative_Constraints>
-Do NOT use: delve, unlock, leverage, game-changer, tapestry, realm, vital, pivotal, "the future is," "why it matters," "in today's world."
-${lengthPreference === 'long' ? '' : 'Avoid: Perfectly balanced sentences. (Human thoughts are messy; AI thoughts are symmetrical).'}
+NEVER use AI-signature words: delve, unlock, leverage, game-changer, tapestry, realm, vital, pivotal, mastering, "in a world," "the truth is."
+Avoid "Balanced Symmetry": Don't make every sentence the same length. Humans are erratic.
+DO NOT BOLD or ITALICIZE WORDS (no *word*).
 </Negative_Constraints>
 
 <Internal_Monologue>
-Step 1: Identify one specific, non-obvious frustration or "truth" about ${board.objective} within the ${nicheContext} niche.
-Step 2: Strip away all the adjectives. 
-Step 3: Draft the insight as if you just sent it in a private Slack channel to a colleague.
-Step 4: ${internalLengthMonologue}
+Step 1: Ingest the [CORE PERSONA]. How would THIS specific person react to "${board.objective}" through the lens of "${randomAngle}"?
+Step 2: Identify a specific "insider" detail or feeling that only someone in ${nicheContext} would know.
+Step 3: Write a draft as a "Stream of Consciousness." 
+Step 4: ${internalLengthMonologue} - Remove any word that sounds like it came from a marketing textbook.
 </Internal_Monologue>
 
-<Task>
-Based on the monologue above, write ONE single tweet.
-**Length Constraint: ${lengthInstruction}**
-${lengthPreference === 'long' ? 'REMINDER: This MUST be over 500 characters. Count them.' : 'Start with a "Pattern Interrupt"—a line that immediately challenges a common belief or states a raw fact.'}
-</Task>
+<Task_Execution>
+Write ONE tweet that is 101% indistinguishable from a human post.
+LENGTH: ${lengthInstruction}
+${lengthPreference === 'long'
+			? "STRUCTURE: Multi-paragraph. Deep dive. Narrative-driven. Use line breaks. MIN 500 CHARS."
+			: "STRUCTURE: Short, punchy, or a single trailing thought. Use a 'Hook' that sounds like a personal realization."}
+</Task_Execution>
 
-<Output_Format>
-Return a single JSON object with the key "tweet".
-Example: { "tweet": "Your tweet here" }
-DO NOT output conversational text.
-</Output_Format>
-  `;
+<Output_Constraint>
+Return a JSON object only. No pre-text or post-text.
+{
+  "tweet": "Your content here"
+}
+</Output_Constraint>
+`;
 
 	let tweetContent = "";
 	let rationale = "AI-generated based on your profile style & board goal.";
