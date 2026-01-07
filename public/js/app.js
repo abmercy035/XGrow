@@ -94,6 +94,7 @@ font - weight: 500;
       case 'profile': app.loadProfile(); break;
       case 'leaderboard': app.loadLeaderboard(); break;
       case 'analytics': app.loadAnalytics(); break;
+      case 'admin': app.loadAdmin(); break;
     }
 
     // Re-render icons after view change
@@ -961,6 +962,106 @@ font - weight: 500;
         </div>
       </div>
     `;
+  },
+
+  loadAdmin: async () => {
+    const container = document.getElementById('view-container');
+    container.innerHTML = '<div style="color:var(--text-secondary);">Loading admin dashboard...</div>';
+
+    try {
+      const [statsRes, usersRes] = await Promise.all([
+        fetch('/api/admin/stats'),
+        fetch('/api/admin/users')
+      ]);
+
+      if (!statsRes.ok || !usersRes.ok) throw new Error('Failed to load admin data');
+
+      const stats = await statsRes.json();
+      const users = await usersRes.json();
+
+      container.innerHTML = `
+            <h2 style="margin-bottom: 24px; color: var(--error);"><i data-lucide="shield-alert" style="width: 24px; height: 24px; display: inline; vertical-align: middle;"></i> Admin Dashboard</h2>
+            
+            <!-- Stats Grid -->
+            <div class="grid-cols" style="margin-bottom: 32px;">
+                <div class="card glass">
+                    <div style="font-size: 0.85rem; color: var(--text-tertiary); text-transform: uppercase;">Total Revenue</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--success);">₦${stats.totalRevenue.toLocaleString()}</div>
+                </div>
+                <div class="card glass">
+                    <div style="font-size: 0.85rem; color: var(--text-tertiary); text-transform: uppercase;">Total Users</div>
+                    <div style="font-size: 2rem; font-weight: 700;">${stats.totalUsers}</div>
+                </div>
+                 <div class="card glass">
+                    <div style="font-size: 0.85rem; color: var(--text-tertiary); text-transform: uppercase;">Pro Users</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: gold;">${stats.proUsers}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">Conversion: ${stats.conversionRate}%</div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+             <div class="card glass">
+                <h3 style="margin-bottom: 16px;">User Management</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                <th style="padding: 12px;">User</th>
+                                <th style="padding: 12px;">Plan</th>
+                                <th style="padding: 12px;">Usage</th>
+                                <th style="padding: 12px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(u => `
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 12px;">
+                                        <div style="font-weight: 600;">${u.username}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-tertiary);">${u.email}</div>
+                                    </td>
+                                    <td style="padding: 12px;">
+                                        ${u.isPro ? '<span style="color: gold;">PRO</span>' : 'Free'}
+                                    </td>
+                                     <td style="padding: 12px;">
+                                         ${u.generationCount} gen <br/>
+                                         ${u._count.boards} boards
+                                    </td>
+                                    <td style="padding: 12px;">
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn btn-outline" style="font-size: 0.7rem; padding: 4px 8px;" onclick="app.adminAction('${u.id}', 'reset_trial')">Reset Trial</button>
+                                            ${!u.isPro ? `<button class="btn btn-primary" style="font-size: 0.7rem; padding: 4px 8px;" onclick="app.adminAction('${u.id}', 'grant_pro')">Grant Pro</button>` : `<button class="btn btn-outline" style="font-size: 0.7rem; padding: 4px 8px; border-color: var(--error); color: var(--error);" onclick="app.adminAction('${u.id}', 'revoke_pro')">Revoke Pro</button>`}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+             </div>
+        `;
+      lucide.createIcons();
+    } catch (err) {
+      container.innerHTML = `<div style="color: var(--error);">Error loading admin: ${err.message}</div>`;
+    }
+  },
+
+  adminAction: async (userId, action) => {
+    if (!confirm('Are you sure?')) return;
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+      if (res.ok) {
+        app.showToast('Action successful', 'success');
+        app.loadAdmin();
+      } else {
+        throw new Error('Failed');
+      }
+    } catch (e) {
+      app.showToast(e.message, 'error');
+    }
   }
 };
 

@@ -46,15 +46,70 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' + secure is needed if cross-site (but strictly lax is usually fine for redirects). Sticking to 'lax' for now or 'none' if needed. 
-    // Actually, for OAuth redirects, 'lax' is best. 'none' requires secure.
-    // Let's safe bet: if production, 'none' (requires secure=true which we have).
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   }
 }));
 
-// Static files
+// --- WAITLIST LOCKDOWN MIDDLEWARE ---
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient(); // Local instance for middleware check
+
+app.use(async (req, res, next) => {
+  // List of open paths (Static assets, Auth, Payment Landing, etc.)
+  const openPaths = [
+    '/landing.html',
+    '/payment.html',
+    '/login.html',
+    '/waitlist-success.html',
+    '/auth',
+    '/api/payment',
+    '/css',
+    '/js',
+    '/images',
+    '/favicon.ico'
+  ];
+
+  // Check if path starts with any open path
+  const isPublic = openPaths.some(path => req.path.startsWith(path));
+
+  // Explicitly handle root '/' vs index.html
+  const isRoot = req.path === '/' || req.path === '/index.html';
+
+  if (isRoot) {
+    if (!req.session.userId) {
+      return res.redirect('/landing.html');
+    }
+
+    // Allow Session check (double check from DB for safety or rely on session)
+    // For speed, check session first. 
+    const user = req.session.user; // Cached user
+
+    if (!user) return res.redirect('/landing.html');
+
+    // ADMIN BYPASS
+    if (user.isAdmin) {
+      return next(); // Proceed to serve index.html via static
+    }
+
+    // PAID USER LOCKOUT
+    if (user.isPro) {
+      return res.redirect('/waitlist-success.html');
+    }
+
+    // UNPAID REDIRECT
+    return res.redirect('/payment.html');
+  }
+
+  // Protect other undefined routes? 
+  // For now, let static middleware handle specific files, but if someone tries to direct link 
+  // to a protected .html (if any exist besides index), we might want to block custom.
+  // Index.html is the only dashboard SPA file.
+
+  next();
+});
+
+// Static files (This serves index.html for '/' if next() is called)
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Routes

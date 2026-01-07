@@ -395,50 +395,84 @@
 	<!-- Hero Section -->
 	<section class="hero">
 		<div class="hero-content">
-			<div class="badge">
-				✨ AI-Powered Growth
+			<div class="badge" style="background: rgba(255, 215, 0, 0.1); border-color: rgba(255, 215, 0, 0.3); color: #FFD700;">
+				Please Note: Waitlist Access Only
 			</div>
-			<h1>Grow Your X Audience on Autopilot</h1>
+			
+			<div style="margin-bottom: 24px;">
+				<h1
+					style="font-size: 4rem; margin-bottom: 8px; background: linear-gradient(135deg, #fff, #8899a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+					78 Hours</h1>
+				<p style="color: var(--text-secondary); margin-top: 0;">Until doors close for Batch #1</p>
+			</div>
+			
+			<!-- Countdown Script -->
+			<div id="countdown" style="display: flex; gap: 16px; margin-bottom: 40px; font-variant-numeric: tabular-nums;">
+				<div class="time-box">
+					<span id="hours" style="font-size: 2.5rem; font-weight: 800; color: white;">78</span>
+					<span style="font-size: 0.8rem; color: var(--text-tertiary); text-transform: uppercase;">Hours</span>
+				</div>
+				<div style="font-size: 2.5rem; font-weight: 800; color: var(--text-tertiary);">:</div>
+				<div class="time-box">
+					<span id="minutes" style="font-size: 2.5rem; font-weight: 800; color: white;">00</span>
+					<span style="font-size: 0.8rem; color: var(--text-tertiary); text-transform: uppercase;">Mins</span>
+				</div>
+				<div style="font-size: 2.5rem; font-weight: 800; color: var(--text-tertiary);">:</div>
+				<div class="time-box">
+					<span id="seconds" style="font-size: 2.5rem; font-weight: 800; color: white;">00</span>
+					<span style="font-size: 0.8rem; color: var(--text-tertiary); text-transform: uppercase;">Secs</span>
+				</div>
+			</div>
+
 			<p>
-				Stop staring at blank screens. Our AI generates engaging tweets that match your unique voice,
-				so you can stay consistent and grow your following without burning out.
+				We are limiting access to ensure system stability. Secure your spot in the next batch before the timer hits zero.
 			</p>
-			<div class="hero-cta">
-				<a href="/login.html" class="btn btn-primary">
-					<svg fill="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; margin-right: 8px;">
-						<path
-							  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
-						</path>
-					</svg>
-					Start Growing Free
+			
+												<div class="hero-cta">
+				<a href="/login.html" class="btn btn-primary"
+				   style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: 700; padding: 16px 40px; font-size: 1.1rem;">
+					<i data-lucide="lock"
+					   style="width: 18px; height: 18px; display: inline; vertical-align: middle; margin-right: 8px;"></i>
+					Join Paid Waitlist ($1.00)
 				</a>
-				<a href="#features" class="btn btn-outline">See How It Works</a>
 			</div>
-		</div>
-		<div class="hero-image">
-			<img src="/images/dashboard-mockup.png" alt="XGrow Dashboard">
+												<p style="font-size: 0.85rem; color: var(--text-tertiary); margin-top: 16px;">
+													<span style="color: var(--success);">●</span> 342 spots claimed today
+												</p>
 		</div>
 	</section>
 
-	<!-- Stats Bar -->
-	<div class="stats-bar">
-		<div class="stat-item">
-			<div class="stat-value">10K+</div>
-			<div class="stat-label">Tweets Generated</div>
-		</div>
-		<div class="stat-item">
-			<div class="stat-value">500+</div>
-			<div class="stat-label">Active Creators</div>
-		</div>
-		<div class="stat-item">
-			<div class="stat-value">85%</div>
-			<div class="stat-label">Engagement Increase</div>
-		</div>
-		<div class="stat-item">
-			<div class="stat-value">14 Days</div>
-			<div class="stat-label">Avg Streak Length</div>
-		</div>
-	</div>
+				<script>
+					// Simple 78hr countdown simulator (persists in session storage for continuity demo)
+					const totalTime = 78 * 60 * 60 * 1000; // 78 hours in ms
+					let endTime = sessionStorage.getItem('waitlistTimer');
+
+					if (!endTime) {
+						endTime = Date.now() + totalTime;
+						sessionStorage.setItem('waitlistTimer', endTime);
+					}
+
+					function updateTimer() {
+						const now = Date.now();
+						let diff = endTime - now;
+
+						if (diff <= 0) {
+							// Reset for demo purposes or stick at 0
+							diff = 0;
+						}
+
+						const h = Math.floor(diff / (1000 * 60 * 60));
+						const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+						const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+						document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+						document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+						document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+					}
+
+					setInterval(updateTimer, 1000);
+					updateTimer();
+				</script>
 
 	<!-- Features Section -->
 	<section class="section" id="features">
