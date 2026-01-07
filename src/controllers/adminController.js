@@ -42,7 +42,7 @@ exports.getUsers = async (req, res) => {
 			take: 50,
 			orderBy: { createdAt: 'desc' },
 			include: {
-				_count: { select: { boards: true, tweets: true } }
+				_count: { select: { boards: true } }
 			}
 		});
 		res.json(users);
