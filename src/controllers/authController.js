@@ -99,16 +99,18 @@ exports.callback = async (req, res) => {
 		req.session.user = { ...user, isPro: user.isPro || false };
 
 		// WAILIST GATEKEEPER
+		// WAILIST GATEKEEPER
+		if (user.isAdmin) {
+			return res.redirect('/'); // Admins go straight to Dashboard
+		}
+
 		if (!user.isPro) {
 			return res.redirect('/payment.html');
 		}
 
 		// If paid but not admin -> Waitlist Success (Lockout dashboard)
-		if (!user.isAdmin) {
-			return res.redirect('/waitlist-success.html');
-		}
-
-		res.redirect('/'); // Admins go to Dashboard
+		// At this point, user is NOT admin (from first check) and IS pro (from second check)
+		return res.redirect('/waitlist-success.html');
 	} catch (err) {
 		console.error('Login error:', err);
 		res.status(403).send(`Invalid verifier or access tokens. Details: ${err.message || JSON.stringify(err)}`);
