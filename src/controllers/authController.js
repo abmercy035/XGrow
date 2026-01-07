@@ -10,6 +10,11 @@ exports.login = async (req, res) => {
 						{ scope: ['tweet.read', 'users.read', 'follows.read', 'like.read', 'offline.access'] }
 					);
 
+		console.log('DEBUG: OAuth Start');
+		console.log('DEBUG: Callback URL sent to Twitter:', callbackUrl);
+		console.log('DEBUG: Client ID present:', !!process.env.TWITTER_CLIENT_ID);
+		console.log('DEBUG: Scopes:', ['tweet.read', 'users.read', 'follows.read', 'like.read', 'offline.access']);
+
 					// Store strict PKCE vars in session
 					req.session.codeVerifier = codeVerifier;
 					req.session.state = state;
