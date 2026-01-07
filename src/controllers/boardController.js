@@ -30,7 +30,9 @@ exports.createBoard = async (req, res) => {
 	const { title, objective, strategy, frequency } = req.body;
 
 	// Freemium Check
-	const user = req.session.user; // Or fetch fresh from DB
+	// Fetch fresh user from DB to ensure 'isPro' is up-to-date (session might be stale)
+	const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
+	
 	if (!user.isPro) {
 		const count = await prisma.board.count({ where: { userId: user.id } });
 		if (count >= 1) {
