@@ -30,10 +30,10 @@ exports.initializePayment = async (req, res) => {
 	try {
 		const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
 
-		// Price: ~ $1.00 (1600 NGN) - Fallback for Nigerian Merchants
+		// Price: ~ $5.00 (Waitlist Discount) - approx 7500 NGN
 		const params = JSON.stringify({
 			email: user.email,
-			amount: 1600 * 100, // 1600 Naira in kobo
+			amount: 7500 * 100, // 7500 Naira in kobo
 			// currency: 'NGN', // Default is NGN
 			callback_url: `${req.protocol}://${req.get('host')}/api/payment/verify`,
 			metadata: {

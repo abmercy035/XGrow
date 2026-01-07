@@ -6,7 +6,11 @@ const twitterClient = new TwitterApi({
 	clientSecret: process.env.TWITTER_CLIENT_SECRET,
 });
 
-const callbackUrl = process.env.TWITTER_CALLBACK_URL;
+const callbackUrl = process.env.TWITTER_CALLBACK_URL || (
+	process.env.NODE_ENV === 'production'
+		? 'https://xgrow.app/auth/twitter/callback'
+		: 'http://localhost:3000/auth/twitter/callback'
+);
 
 module.exports = {
 	twitterClient,
