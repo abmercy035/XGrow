@@ -33,7 +33,7 @@ exports.createBoard = async (req, res) => {
 	// Fetch fresh user from DB to ensure 'isPro' is up-to-date (session might be stale)
 	const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
 	
-	if (!user.isPro) {
+	if (!user.isPro && !user.isAdmin) {
 		const count = await prisma.board.count({ where: { userId: user.id } });
 		if (count >= 1) {
 			return res.status(403).json({ error: 'Free tier limited to 1 board. Upgrade to Pro.' });
@@ -66,7 +66,7 @@ exports.generateTweet = async (req, res) => {
 	const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
 
 	// Trial Limit Enforcement
-	if (!user.isPro) {
+	if (!user.isPro && !user.isAdmin) {
 		if (user.generationCount >= 3) {
 			return res.status(403).json({
 				error: 'LIMIT_REACHED',
