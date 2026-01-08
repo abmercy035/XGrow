@@ -94,11 +94,11 @@ exports.callback = async (req, res) => {
 		});
 
 
+
 		// Update Session
 		req.session.userId = user.id;
-		req.session.user = { ...user, isPro: user.isPro || false };
+		req.session.user = { ...user, isPro: user.isPro || user.isAdmin || false };
 
-		// WAILIST GATEKEEPER
 		// WAILIST GATEKEEPER
 		if (user.isAdmin) {
 			return res.redirect('/'); // Admins go straight to Dashboard
@@ -128,5 +128,8 @@ exports.getMe = async (req, res) => {
 		return res.status(401).json({ error: 'Unauthorized' });
 	}
 	const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
+	if (user && user.isAdmin) {
+		user.isPro = true; // Admins automatically get Pro features
+	}
 	res.json(user);
 };
