@@ -87,15 +87,19 @@ exports.generateTweet = async (req, res) => {
 		const { length } = req.body; // Expects 'short' or 'long'
 		const tweet = await contentService.generateDailyTweet(boardId, length);
 
-		// Increment usage count
-		await prisma.user.update({
-			where: { id: req.session.userId },
-			data: { generationCount: { increment: 1 } }
-		});
+		// Increment usage count (Fail-safe)
+		try {
+			await prisma.user.update({
+				where: { id: req.session.userId },
+				data: { generationCount: { increment: 1 } }
+			});
+		} catch (dbErr) {
+			console.warn('Failed to increment usage count:', dbErr.message);
+		}
 
 		res.json(tweet);
 	} catch (err) {
 		console.error(err);
-		res.status(500).json({ error: 'Generation failed' });
+		res.status(500).json({ error: 'Generation failed', details: err.message });
 	}
 };
