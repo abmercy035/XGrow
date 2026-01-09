@@ -29,11 +29,16 @@ exports.createBoard = async (req, res) => {
 
 	const { title, objective, strategy, frequency } = req.body;
 
+
 	// Freemium Check
 	// Fetch fresh user from DB to ensure 'isPro' is up-to-date (session might be stale)
 	const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
-	
-	if (!user.isPro && !user.isAdmin) {
+	const sessionUser = req.session.user || {}; // Fallback from session
+
+	// Allow if EITHER DB User OR Session User is Pro/Admin
+	const isPrivileged = (user.isPro || user.isAdmin) || (sessionUser.isPro || sessionUser.isAdmin);
+
+	if (!isPrivileged) {
 		const count = await prisma.board.count({ where: { userId: user.id } });
 		if (count >= 1) {
 			return res.status(403).json({ error: 'Free tier limited to 1 board. Upgrade to Pro.' });
@@ -64,9 +69,12 @@ exports.generateTweet = async (req, res) => {
 
 	// Fetch fresh user data for limits
 	const user = await prisma.user.findUnique({ where: { id: req.session.userId } });
+	const sessionUser = req.session.user || {}; // Fallback from session
+
+	const isPrivileged = (user.isPro || user.isAdmin) || (sessionUser.isPro || sessionUser.isAdmin);
 
 	// Trial Limit Enforcement
-	if (!user.isPro && !user.isAdmin) {
+	if (!isPrivileged) {
 		if (user.generationCount >= 3) {
 			return res.status(403).json({
 				error: 'LIMIT_REACHED',
